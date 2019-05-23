@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert, Button } from 'react-native';
+import { StyleSheet, Text, View, Alert, Button, AsyncStorage,ActivityIndicator } from 'react-native';
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
 } from 'react-native-google-signin';
-import { createStackNavigator, createAppContainer } from "react-navigation";
-import Dashboard from './Dashboard';
+import { USER_KEY,CHANNEL_ID } from '../components/config'
+let dataFile = require('./data.json');
 
   export default class Login extends React.Component {
   constructor(props) {
@@ -16,14 +16,15 @@ import Dashboard from './Dashboard';
     };
 
   }
-  componentDidMount() {
+  componentDidMount() { 
+
     GoogleSignin.configure({
       //It is mandatory to call this method before attempting to call signIn()
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+      scopes: ['https://www.googleapis.com/auth/youtube.readonly email profile', 'https://www.googleapis.com/auth/youtube'],
       // Repleace with your webClientId generated from Firebase console
-    //   webClientId:
+      webClientId: '335465328392-7g3l551l8ehtocnn3rt2o0rtlesc2387.apps.googleusercontent.com',
     //     'Replace Your Web Client Id here',
-    androidClientId: '728636078744-889hbff5hcsiuf5sjuro1mpvhr5dqm6r.apps.googleusercontent.com'
+    androidClientId: '335465328392-76edho6pq3pifu171roh4l47taism0cu.apps.googleusercontent.com'
 
     });
   }
@@ -37,9 +38,36 @@ import Dashboard from './Dashboard';
       });
       const userInfo = await GoogleSignin.signIn();
       console.log('User Info --> ', userInfo);
-      this.setState({ userInfo: userInfo });
-      console.log('User Info --> ', this.props);
-      this.props.navigation.navigate("Dashboard");
+
+      const url = 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true&key=AIzaSyA4uAAtKaBWLx7-UnD-5yX2GEhboAmjojQ';
+      try {
+        const tokens = await GoogleSignin.getTokens();
+        console.log('User token --> ', tokens);
+        AsyncStorage.setItem(USER_KEY, tokens.accessToken);
+        
+        fetch(url, {
+          headers: { Authorization: `Bearer ${tokens.accessToken}` }
+          }).then(response => response.json())
+            .then((responseJson)=> {
+              var data = JSON.stringify(responseJson)
+              var data1 = JSON.parse(data);
+              var channelId = data1.items[0].id;
+
+             console.log(" channel Id== --> "+ channelId)
+
+             if(data1.items.length ==1)
+             {
+              this.props.navigation.navigate("ChannelList", { channellist : data1.items});
+             }
+             else {
+              AsyncStorage.setItem(CHANNEL_ID, channelId);
+              this.props.navigation.navigate("Dashboard");
+             }
+          });
+      } catch (error) {
+        console.error(error);
+      }
+     
     } catch (error) {
       console.log('Message', error.message);
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
@@ -53,36 +81,18 @@ import Dashboard from './Dashboard';
       }
     }
   };
-  _getCurrentUser = async () => {
-    //May be called eg. in the componentDidMount of your main component.
-    //This method returns the current user
-    //if they already signed in and null otherwise.
-    try {
-      const userInfo = await GoogleSignin.signInSilently();
-      this.setState({ userInfo });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  _signOut = async () => {
-    //Remove user session from the device.
-    try {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-      this.setState({ user: null }); // Remove the user from your app's state as well
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  _revokeAccess = async () => {
-    //Remove your application from the user authorized applications.
-    try {
-      await GoogleSignin.revokeAccess();
-      console.log('deleted');
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // _getCurrentUser = async () => {
+  //   //May be called eg. in the componentDidMount of your main component.
+  //   //This method returns the current user
+  //   //if they already signed in and null otherwise.
+  //   try {
+  //     const userInfo = await GoogleSignin.signInSilently();
+  //     this.setState({ userInfo });
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+  
   render() {
     return (
       <View style={styles.container}>
@@ -92,7 +102,6 @@ import Dashboard from './Dashboard';
           color={GoogleSigninButton.Color.Light}
           onPress={this._signIn}
         />
-        <Button onPress={()=>this.props.navigation.navigate("Dashboard")} title="Home"></Button>
       </View>
     );
   }
@@ -107,15 +116,7 @@ const styles = StyleSheet.create({
 }); 
 
 
-// const AppNavigator = createStackNavigator({
-//   login: {
-//     screen: Login
-//   },
-//   Dashboard: {
-//     screen: Dashboard
-//   }
-// }
-// );
 
-// export default createAppContainer(AppNavigator);
+
+
 

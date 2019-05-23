@@ -4,7 +4,9 @@ import {
   Text,
   Button,
   StyleSheet,
-  AsyncStorage
+  AsyncStorage,
+  ToolbarAndroid,
+  Dimensions
 } from 'react-native'
 import {Navigation} from 'react-native-navigation';
 
@@ -29,15 +31,12 @@ export default class News extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <ToolbarAndroid
+        title='News'
+        style={styles.toolbar}
+        onActionSelected={this.onActionSelected} />       
+         <Text> hello home</Text>
         <Text>Hello from Home screen.</Text>
-        <Button
-          onPress={this.logout}
-          title="Sign Out"
-        />
-        <Button
-        
-          title="View next screen"
-        />
       </View>
     )
   }
@@ -48,6 +47,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  toolbar: {
+    backgroundColor: 'white',
+    height: 54,
+    position: 'absolute', 
+    top: 0, 
+    left: 0, 
+    width: Dimensions.get('window').width,
+    elevation: 2,
+
   }
 })
 

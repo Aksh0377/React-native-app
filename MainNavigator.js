@@ -1,17 +1,20 @@
 import React, { Component } from "react";
-import { createStackNavigator, createAppContainer } from 'react-navigation';
+import { createSwitchNavigator, createAppContainer } from 'react-navigation';
 import Login from "./src/screens/Login";
 import Dashboard from "./src/screens/Dashboard";
-import Home from "./src/screens/Home";
+import ChannelList from "./src/screens/ChannelList";
 import Splash from "./src/screens/Splash";
 
- const Project= createStackNavigator({
+ const Project= createSwitchNavigator({
   Splash: {
     screen: Splash
     },
    Login: {
     screen: Login
     },
+    ChannelList: {
+      screen: ChannelList
+      },
     Dashboard: {
       screen: Dashboard
      }
