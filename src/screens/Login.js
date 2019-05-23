@@ -22,9 +22,9 @@ let dataFile = require('./data.json');
       //It is mandatory to call this method before attempting to call signIn()
       scopes: ['https://www.googleapis.com/auth/youtube.readonly email profile', 'https://www.googleapis.com/auth/youtube'],
       // Repleace with your webClientId generated from Firebase console
-      webClientId: '335465328392-7g3l551l8ehtocnn3rt2o0rtlesc2387.apps.googleusercontent.com',
+      webClientId: 'your-web-client-id',
     //     'Replace Your Web Client Id here',
-    androidClientId: '335465328392-76edho6pq3pifu171roh4l47taism0cu.apps.googleusercontent.com'
+    androidClientId: 'your-android-client-id'
 
     });
   }
@@ -39,7 +39,7 @@ let dataFile = require('./data.json');
       const userInfo = await GoogleSignin.signIn();
       console.log('User Info --> ', userInfo);
 
-      const url = 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true&key=AIzaSyA4uAAtKaBWLx7-UnD-5yX2GEhboAmjojQ';
+      const url = 'https://www.googleapis.com/youtube/v3/channels?part=snippet&mine=true&key={API-KEY};
       try {
         const tokens = await GoogleSignin.getTokens();
         console.log('User token --> ', tokens);
@@ -81,17 +81,6 @@ let dataFile = require('./data.json');
       }
     }
   };
-  // _getCurrentUser = async () => {
-  //   //May be called eg. in the componentDidMount of your main component.
-  //   //This method returns the current user
-  //   //if they already signed in and null otherwise.
-  //   try {
-  //     const userInfo = await GoogleSignin.signInSilently();
-  //     this.setState({ userInfo });
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
   
   render() {
     return (
